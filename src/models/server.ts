@@ -3,6 +3,9 @@ import colors from 'colors/safe';
 import morgan from 'morgan';
 import cors from 'cors';
 
+// Routes
+import plantillaRoute from '../routes/plantilla.route';
+
 export class Server {
     private app: Application;
     private port: string;
@@ -30,7 +33,7 @@ export class Server {
     }
 
     private routes() {
-        // this.app.use(this.paths.plantilla, require('./routes/plantilla'));
+        this.app.use(this.paths.plantilla, plantillaRoute);
     }
 
     async listen() {
