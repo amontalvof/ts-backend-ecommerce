@@ -5,12 +5,14 @@ import cors from 'cors';
 
 // Routes
 import plantillaRoute from '../routes/plantilla.route';
+import productsRoute from '../routes/products.route';
 
 export class Server {
     private app: Application;
     private port: string;
     private paths = {
         plantilla: '/api/plantilla',
+        products: '/api/products',
     };
 
     constructor() {
@@ -34,6 +36,7 @@ export class Server {
 
     private routes() {
         this.app.use(this.paths.plantilla, plantillaRoute);
+        this.app.use(this.paths.products, productsRoute);
     }
 
     async listen() {
