@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { connect } from '../database/connection';
+import { Server } from '../models/server';
 
 export async function readSubCategories(
     req: Request,
     res: Response
 ): Promise<Response | void> {
     try {
-        const conn = await connect();
+        const conn = Server.connection;
         const posts = await conn.query('SELECT * FROM subcategorias');
         return res.json({
             ok: true,

@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import { Pool } from 'mysql2/promise';
 import colors from 'colors/safe';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -6,8 +7,10 @@ import cors from 'cors';
 // Routes
 import plantillaRoute from '../routes/plantilla.route';
 import productsRoute from '../routes/products.route';
+import { connect } from '../database/connection';
 
 export class Server {
+    static connection: Pool;
     private app: Application;
     private port: string;
     private paths = {
@@ -19,8 +22,13 @@ export class Server {
         this.app = express();
         this.port = process.env.PORT || '8080';
 
+        this.dbConnection();
         this.middlewares();
         this.routes();
+    }
+
+    async dbConnection() {
+        Server.connection = await connect();
     }
 
     private middlewares() {
