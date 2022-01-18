@@ -7,6 +7,7 @@ import cors from 'cors';
 // Routes
 import plantillaRoute from '../routes/plantilla.route';
 import productsRoute from '../routes/products.route';
+import sliderRoute from '../routes/slider.route';
 import { connect } from '../database/connection';
 
 export class Server {
@@ -16,6 +17,7 @@ export class Server {
     private paths = {
         plantilla: '/api/plantilla',
         products: '/api/products',
+        slider: '/api/slider',
     };
 
     constructor() {
@@ -45,6 +47,7 @@ export class Server {
     private routes() {
         this.app.use(this.paths.plantilla, plantillaRoute);
         this.app.use(this.paths.products, productsRoute);
+        this.app.use(this.paths.slider, sliderRoute);
     }
 
     async listen() {
