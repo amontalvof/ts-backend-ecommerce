@@ -4,11 +4,11 @@
  */
 
 import { readCategories } from '../controllers/categories.controller';
-import {
-    readFreeProducts,
-    readRelevantProducts,
-} from '../controllers/products.controller';
 import { readSubCategories } from '../controllers/subcategories.controller';
+import {
+    readRelevantProducts,
+    readRouteProducts,
+} from '../controllers/products.controller';
 
 const { Router } = require('express');
 
@@ -21,9 +21,9 @@ router.get('/categories', readCategories);
 router.get('/categories/subcategories', readSubCategories);
 
 // read relevant products
-router.get('/relevant/:order', readRelevantProducts);
+router.get('/relevant', readRelevantProducts);
 
-// read free products
-router.get('/free', readFreeProducts);
+// read relevant products
+router.get('/routes', readRouteProducts);
 
 export default router;
