@@ -8,6 +8,7 @@ import { readSubCategories } from '../controllers/subcategories.controller';
 import {
     readRelevantProducts,
     readRouteProducts,
+    readProducts,
 } from '../controllers/products.controller';
 
 const { Router } = require('express');
@@ -22,6 +23,9 @@ router.get('/categories/subcategories', readSubCategories);
 
 // read relevant products
 router.get('/relevant', readRelevantProducts);
+
+// read products
+router.post('/', readProducts);
 
 // read relevant products
 router.get('/routes', readRouteProducts);

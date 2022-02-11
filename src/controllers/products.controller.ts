@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import resolveProductsQuery from '../helpers/resolveProductsQuery';
 import { Server } from '../models/server';
 
 export const readRelevantProducts = async (
@@ -6,15 +7,14 @@ export const readRelevantProducts = async (
     res: Response
 ): Promise<Response | void> => {
     try {
-        const order = req.params.order;
         const conn = Server.connection;
 
         const freeQuery =
-            'SELECT productos.*, categorias.categoria, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM productos left join categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id WHERE precio = 0 ORDER BY id LIMIT 4;';
+            'SELECT productos.*, categorias.categoria, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM productos LEFT JOIN categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id WHERE precio = 0 ORDER BY id LIMIT 4;';
         const ventasQuery =
-            'SELECT productos.*, categorias.categoria, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM productos left join categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id ORDER BY ventas DESC LIMIT 4;';
+            'SELECT productos.*, categorias.categoria, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM productos LEFT JOIN categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id ORDER BY ventas DESC LIMIT 4;';
         const vistasQuery =
-            'SELECT productos.*, categorias.categoria, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM productos left join categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id ORDER BY vistas DESC LIMIT 4;';
+            'SELECT productos.*, categorias.categoria, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM productos LEFT JOIN categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id ORDER BY vistas DESC LIMIT 4;';
 
         const freeRelevant = await conn.query(freeQuery);
         const ventasRelevant = await conn.query(ventasQuery);
@@ -47,6 +47,29 @@ export const readRouteProducts = async (
         return res.json({
             ok: true,
             routes: routes[0],
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Please talk to the administrator.',
+        });
+    }
+};
+
+export const readProducts = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const body = req.body;
+        const conn = Server.connection;
+        const query = resolveProductsQuery(body);
+        const products = await conn.query(query);
+
+        return res.json({
+            ok: true,
+            products: products[0],
         });
     } catch (error) {
         console.error(error);
