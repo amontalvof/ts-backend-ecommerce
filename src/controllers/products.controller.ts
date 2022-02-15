@@ -9,12 +9,30 @@ export const readRelevantProducts = async (
     try {
         const conn = Server.connection;
 
-        const freeQuery =
-            'SELECT productos.*, categorias.categoria, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM productos LEFT JOIN categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id WHERE precio = 0 ORDER BY id LIMIT 4;';
-        const ventasQuery =
-            'SELECT productos.*, categorias.categoria, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM productos LEFT JOIN categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id ORDER BY ventas DESC LIMIT 4;';
-        const vistasQuery =
-            'SELECT productos.*, categorias.categoria, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM productos LEFT JOIN categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id ORDER BY vistas DESC LIMIT 4;';
+        const freeQuery = resolveProductsQuery({
+            ordenar: 'id',
+            modo: 'ASC',
+            item: 'precio',
+            valor: 0,
+            base: 0,
+            tope: 4,
+        });
+        const ventasQuery = resolveProductsQuery({
+            ordenar: 'ventas',
+            modo: 'DESC',
+            item: null,
+            valor: null,
+            base: 0,
+            tope: 4,
+        });
+        const vistasQuery = resolveProductsQuery({
+            ordenar: 'vistas',
+            modo: 'DESC',
+            item: null,
+            valor: null,
+            base: 0,
+            tope: 4,
+        });
 
         const freeRelevant = await conn.query(freeQuery);
         const ventasRelevant = await conn.query(ventasQuery);
