@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import resolveProductsQuery from '../helpers/resolveProductsQuery';
+import resolveTotalProductsQuery from '../helpers/resolveTotalProductsQuery';
 import { Server } from '../models/server';
 
 export const readRelevantProducts = async (
@@ -83,11 +84,14 @@ export const readProducts = async (
         const body = req.body;
         const conn = Server.connection;
         const query = resolveProductsQuery(body);
+        const totalQuery = resolveTotalProductsQuery(body);
         const products = await conn.query(query);
+        const total = (await conn.query(totalQuery)) as any;
 
         return res.json({
             ok: true,
             products: products[0],
+            ...total[0][0],
         });
     } catch (error) {
         console.error(error);
