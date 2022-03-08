@@ -7,6 +7,7 @@ import cors from 'cors';
 // Routes
 import plantillaRoute from '../routes/plantilla.route';
 import productsRoute from '../routes/products.route';
+import productRoute from '../routes/product.route';
 import sliderRoute from '../routes/slider.route';
 import bannerRoute from '../routes/banner.route';
 import { connect } from '../database/connection';
@@ -18,6 +19,7 @@ export class Server {
     private paths = {
         plantilla: '/api/plantilla',
         products: '/api/products',
+        product: '/api/product',
         slider: '/api/slider',
         banner: '/api/banner',
     };
@@ -49,6 +51,7 @@ export class Server {
     private routes() {
         this.app.use(this.paths.plantilla, plantillaRoute);
         this.app.use(this.paths.products, productsRoute);
+        this.app.use(this.paths.product, productRoute);
         this.app.use(this.paths.slider, sliderRoute);
         this.app.use(this.paths.banner, bannerRoute);
     }
