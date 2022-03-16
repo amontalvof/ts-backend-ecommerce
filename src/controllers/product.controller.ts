@@ -24,3 +24,27 @@ export const readProduct = async (
         });
     }
 };
+
+export const updateProduct = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const body = req.body;
+        const { ruta, item, valor } = body;
+        const conn = Server.connection;
+        await conn.query(
+            `UPDATE productos SET ${item} = ${valor} WHERE ruta = '${ruta}'`
+        );
+        return res.json({
+            ok: true,
+            message: 'Product updated successfully',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Please talk to the administrator.',
+        });
+    }
+};
