@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Server } from '../models/server';
+import { Server } from '../server';
 
 export async function readSubCategories(
     req: Request,

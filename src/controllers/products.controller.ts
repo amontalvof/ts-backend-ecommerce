@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import resolveProductsQuery from '../helpers/resolveProductsQuery';
 import resolveTotalProductsQuery from '../helpers/resolveTotalProductsQuery';
-import { Server } from '../models/server';
+import { Server } from '../server';
 
 export const readRelevantProducts = async (
     req: Request,

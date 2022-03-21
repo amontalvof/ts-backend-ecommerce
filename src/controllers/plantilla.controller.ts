@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Server } from '../models/server';
+import { Server } from '../server';
 
 export const readStyles = async (
     req: Request,

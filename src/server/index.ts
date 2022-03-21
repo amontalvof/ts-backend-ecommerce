@@ -10,6 +10,7 @@ import productsRoute from '../routes/products.route';
 import productRoute from '../routes/product.route';
 import sliderRoute from '../routes/slider.route';
 import bannerRoute from '../routes/banner.route';
+import authRoute from '../routes/auth.route';
 import { connect } from '../database/connection';
 
 export class Server {
@@ -22,6 +23,7 @@ export class Server {
         product: '/api/product',
         slider: '/api/slider',
         banner: '/api/banner',
+        auth: '/api/auth',
     };
 
     constructor() {
@@ -54,6 +56,7 @@ export class Server {
         this.app.use(this.paths.product, productRoute);
         this.app.use(this.paths.slider, sliderRoute);
         this.app.use(this.paths.banner, bannerRoute);
+        this.app.use(this.paths.auth, authRoute);
     }
 
     async listen() {
