@@ -7,7 +7,11 @@ import { Router } from 'express';
 import { check } from 'express-validator';
 import validateFields from '../middlewares/validate.fields';
 import verifyPasswordsMatch from '../middlewares/verify.passwords.match';
-const { createUser } = require('../controllers/auth.controller');
+const {
+    createUser,
+    readUser,
+    updateUser,
+} = require('../controllers/auth.controller');
 
 const router = Router();
 
@@ -48,5 +52,9 @@ router.post(
     ],
     createUser
 );
+
+router.post('/', readUser);
+
+router.put('/:userId', updateUser);
 
 export default router;
