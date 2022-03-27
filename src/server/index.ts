@@ -11,6 +11,7 @@ import productRoute from '../routes/product.route';
 import sliderRoute from '../routes/slider.route';
 import bannerRoute from '../routes/banner.route';
 import authRoute from '../routes/auth.route';
+import userRoute from '../routes/user.route';
 import { connect } from '../database/connection';
 
 export class Server {
@@ -24,6 +25,7 @@ export class Server {
         slider: '/api/slider',
         banner: '/api/banner',
         auth: '/api/auth',
+        user: '/api/user',
     };
 
     constructor() {
@@ -57,6 +59,7 @@ export class Server {
         this.app.use(this.paths.slider, sliderRoute);
         this.app.use(this.paths.banner, bannerRoute);
         this.app.use(this.paths.auth, authRoute);
+        this.app.use(this.paths.user, userRoute);
     }
 
     async listen() {

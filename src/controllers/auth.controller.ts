@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 import { Request, Response } from 'express';
-import { omit, isEmpty } from 'lodash';
 import bcrypt from 'bcryptjs';
 import { Server } from '../server';
 import sendEmail from '../services/sendEmail';
 import verifyEmailTemplate from '../services/templates/verifyEmail';
 import generateJWT from '../helpers/generateJwt';
+import { IAuthInfoRequest } from '../types/request';
 
 interface IUser {
     nombre: string;
@@ -56,9 +56,6 @@ export const createUser = async (
 
         await conn.query('INSERT INTO usuarios SET ?', [newUser]);
 
-        // generate JSON Web Token
-        const token = await generateJWT(regName, hash);
-
         //send email verification
         const email = {
             from: process.env.DEFAULT_FROM_ADDRESS || '',
@@ -85,7 +82,6 @@ export const createUser = async (
             email: regEmail,
             modo: 'directo',
             foto: '',
-            token,
         });
     } catch (error) {
         console.error(error);
@@ -96,33 +92,49 @@ export const createUser = async (
     }
 };
 
-export const readUser = async (
+export const loginUser = async (
     req: Request,
     res: Response
 ): Promise<Response | void> => {
+    const { logEmail, logPassword } = req.body;
+
     try {
-        const { item, valor } = req.body;
         const conn = Server.connection;
         const [user] = await conn.query(
-            `SELECT * FROM usuarios where ${item} = '${valor}'`
+            `SELECT * FROM usuarios where email = '${logEmail}'`
         );
-
-        const userData = Array.isArray(user) && (user[0] as any);
-        const finalUserData = omit(userData, 'password');
-
-        if (isEmpty(finalUserData)) {
+        if (Array.isArray(user) && user.length === 0) {
             return res.status(400).json({
                 ok: false,
-                message: 'Error verifying email.',
+                message:
+                    "The email address that you've entered doesn't match any account.",
+            });
+        }
+        const { id, nombre, password, email, foto } = (user as any)[0];
+
+        //confirm passwords
+        const validPassword = bcrypt.compareSync(logPassword, password);
+
+        if (!validPassword) {
+            return res.status(400).json({
+                ok: false,
+                message: 'The password you entered for the user is incorrect.',
             });
         }
 
-        res.status(200).json({
+        // generate JSON Web Token
+        const token = await generateJWT(id, nombre);
+
+        res.json({
             ok: true,
-            user: finalUserData,
+            id,
+            nombre,
+            foto,
+            email,
+            token,
         });
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).json({
             ok: false,
             message: 'Please talk to the administrator.',
@@ -130,22 +142,39 @@ export const readUser = async (
     }
 };
 
-export const updateUser = async (
-    req: Request,
+export const renewToken = async (
+    req: IAuthInfoRequest,
     res: Response
 ): Promise<Response | void> => {
+    const { uid = '', name = '' } = req;
     try {
-        const id = req.params.userId;
-        const userData = req.body;
         const conn = Server.connection;
-        await conn.query('UPDATE usuarios set ? WHERE id = ?', [userData, id]);
+        const [user] = await conn.query(
+            `SELECT * FROM usuarios where id = '${uid}'`
+        );
 
-        res.status(200).json({
+        if (Array.isArray(user) && user.length === 0) {
+            return res.status(400).json({
+                ok: false,
+                message: 'The user does not exist.',
+            });
+        }
+
+        const { id, nombre, email, foto } = (user as any)[0];
+
+        // generate JSON Web Token
+        const token = await generateJWT(uid, name);
+
+        res.json({
             ok: true,
-            message: 'User updated successfully.',
+            id,
+            nombre,
+            foto,
+            email,
+            token,
         });
     } catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).json({
             ok: false,
             message: 'Please talk to the administrator.',

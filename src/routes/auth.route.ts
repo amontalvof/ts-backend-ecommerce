@@ -6,11 +6,12 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 import validateFields from '../middlewares/validate.fields';
+import validateJwt from '../middlewares/validate.jwt';
 import verifyPasswordsMatch from '../middlewares/verify.passwords.match';
 const {
     createUser,
-    readUser,
-    updateUser,
+    loginUser,
+    renewToken,
 } = require('../controllers/auth.controller');
 
 const router = Router();
@@ -53,8 +54,26 @@ router.post(
     createUser
 );
 
-router.post('/', readUser);
+router.post(
+    '/',
+    [
+        check('logEmail', 'An email is required.').not().isEmpty(),
+        check('logEmail', 'The email has an invalid format.').isEmail(),
+        check(
+            'logPassword',
+            'The full name must be between 8 and 20 characters.'
+        ).isLength({ min: 8, max: 20 }),
+        check(
+            'logPassword',
+            'The password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
+        ).matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/
+        ),
+        validateFields,
+    ],
+    loginUser
+);
 
-router.put('/:userId', updateUser);
+router.get('/renew', validateJwt, renewToken);
 
 export default router;
