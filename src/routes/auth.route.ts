@@ -5,6 +5,7 @@
 
 import { Router } from 'express';
 import { check } from 'express-validator';
+import { forgotPassword } from '../controllers/auth.controller';
 import validateFields from '../middlewares/validate.fields';
 import validateJwt from '../middlewares/validate.jwt';
 import verifyPasswordsMatch from '../middlewares/verify.passwords.match';
@@ -73,6 +74,13 @@ router.post(
     ],
     loginUser
 );
+
+router.put('/forgotPassword', [
+    check('fgpEmail', 'An email is required.').not().isEmpty(),
+    check('fgpEmail', 'The email has an invalid format.').isEmail(),
+    validateFields,
+    forgotPassword,
+]);
 
 router.get('/renew', validateJwt, renewToken);
 

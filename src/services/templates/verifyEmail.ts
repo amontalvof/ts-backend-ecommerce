@@ -1,4 +1,5 @@
-export default `<html lang='en'>
+export default `
+<html lang='en'>
     <head>
         <meta charset='UTF-8' />
         <title>Verify Email</title>

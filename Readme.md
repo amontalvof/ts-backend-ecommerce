@@ -6,7 +6,6 @@
 -   Node
 -   Express
 -   JWT
--   AJV
 -   Nodemailer
 -   Handlebars
 -   Sendgrid

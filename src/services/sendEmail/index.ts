@@ -28,7 +28,7 @@ const sendEmail = async (document: IDocument) => {
         console.error(error);
         return {
             ok: false,
-            message: `There was a problem sending email verification to "${to}"`,
+            message: `There was a problem sending email to "${to}"`,
         };
     }
 };
