@@ -8,15 +8,17 @@ import forgotPasswordTemplate from '../services/templates/forgotPassword';
 import generateJWT from '../helpers/generateJwt';
 import { IAuthInfoRequest } from '../types/request';
 import generateRandomPassword from '../helpers/generateRandomPassword';
+import googleVerify from '../helpers/googleVerify';
+import capitalizeFirstLetter from '../helpers/capitalizeFirstLetter';
 
 interface IUser {
     nombre: string;
-    password: string;
+    password: string | null;
     email: string;
     modo: string;
     foto: string;
     verificacion: number;
-    emailEncriptado: string;
+    emailEncriptado: string | null;
 }
 
 export const createUser = async (
@@ -35,7 +37,7 @@ export const createUser = async (
             return res.status(400).json({
                 ok: false,
                 message:
-                    'A user with that email already exists in the database.',
+                    'Sorry, a user with that email already exists in the database.',
             });
         }
 
@@ -109,12 +111,21 @@ export const loginUser = async (
             return res.status(400).json({
                 ok: false,
                 message:
-                    "The email address that you've entered doesn't match any account.",
+                    "Sorry, the email address that you've entered doesn't match any account.",
             });
         }
-        const { id, nombre, password, email, foto, verificacion } = (
+        const { id, nombre, password, email, foto, verificacion, modo } = (
             user as any
         )[0];
+
+        if (modo !== 'directo') {
+            return res.status(400).json({
+                ok: false,
+                message: `Sorry, the email address that you've entered was registered by ${capitalizeFirstLetter(
+                    modo
+                )}.`,
+            });
+        }
 
         //confirm passwords
         const validPassword = bcrypt.compareSync(logPassword, password);
@@ -122,7 +133,8 @@ export const loginUser = async (
         if (!validPassword) {
             return res.status(400).json({
                 ok: false,
-                message: 'The password you entered for the user is incorrect.',
+                message:
+                    'Sorry, the password you entered for the user is incorrect.',
             });
         }
 
@@ -146,7 +158,82 @@ export const loginUser = async (
             token,
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Please talk to the administrator.',
+        });
+    }
+};
+
+export const googleSignIn = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    const { tokenId } = req.body;
+    try {
+        const { name, picture, email } = await googleVerify(tokenId);
+
+        const conn = Server.connection;
+        const [user] = await conn.query(
+            `SELECT * FROM usuarios where email = '${email}'`
+        );
+
+        if (Array.isArray(user) && user.length === 0) {
+            const newUser: IUser = {
+                nombre: name,
+                password: '',
+                email,
+                modo: 'google',
+                foto: picture,
+                verificacion: 0,
+                emailEncriptado: '',
+            };
+
+            const resp = await conn.query('INSERT INTO usuarios SET ?', [
+                newUser,
+            ]);
+
+            const { insertId } = (resp as any)[0];
+
+            // generate JSON Web Token
+            const token = await generateJWT(insertId, name);
+
+            return res.status(200).json({
+                ok: true,
+                id: insertId,
+                nombre: name,
+                foto: picture,
+                email,
+                token,
+            });
+        }
+
+        const { id, modo } = (user as any)[0];
+
+        if (modo !== 'google') {
+            return res.status(400).json({
+                ok: false,
+                message: `Sorry, the Google account you select has been registered by email and password.`,
+            });
+        }
+
+        const userData = { nombre: name, foto: picture };
+        await conn.query('UPDATE usuarios set ? WHERE id = ?', [userData, id]);
+
+        // generate JSON Web Token
+        const token = await generateJWT(id, name);
+
+        res.status(200).json({
+            ok: true,
+            id,
+            nombre: name,
+            foto: picture,
+            email,
+            token,
+        });
+    } catch (error) {
+        console.error(error);
         res.status(500).json({
             ok: false,
             message: 'Please talk to the administrator.',
@@ -168,7 +255,7 @@ export const renewToken = async (
         if (Array.isArray(user) && user.length === 0) {
             return res.status(400).json({
                 ok: false,
-                message: 'The user does not exist.',
+                message: 'Sorry, the user does not exist in the database.',
             });
         }
 
@@ -186,7 +273,7 @@ export const renewToken = async (
             token,
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             message: 'Please talk to the administrator.',
@@ -211,7 +298,7 @@ export const forgotPassword = async (
             return res.status(400).json({
                 ok: false,
                 message:
-                    'A user with that email does not exists in the database.',
+                    'Sorry, a user with that email does not exists in the database.',
             });
         }
         const uid = Array.isArray(user) && (user[0] as any).id;
@@ -249,7 +336,7 @@ export const forgotPassword = async (
             message: 'Password updated successfully.',
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             ok: false,
             message: 'Please talk to the administrator.',

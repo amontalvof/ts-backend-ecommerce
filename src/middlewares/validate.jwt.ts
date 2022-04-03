@@ -27,7 +27,7 @@ const validateJwt = (
         req.uid = uid;
         req.name = name;
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(401).json({
             ok: false,
             message: 'Invalid auth token.',

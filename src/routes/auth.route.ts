@@ -5,20 +5,21 @@
 
 import { Router } from 'express';
 import { check } from 'express-validator';
-import { forgotPassword } from '../controllers/auth.controller';
 import validateFields from '../middlewares/validate.fields';
 import validateJwt from '../middlewares/validate.jwt';
 import verifyPasswordsMatch from '../middlewares/verify.passwords.match';
-const {
+import {
     createUser,
     loginUser,
     renewToken,
-} = require('../controllers/auth.controller');
+    forgotPassword,
+    googleSignIn,
+} from '../controllers/auth.controller';
 
 const router = Router();
 
 router.post(
-    '/new',
+    '/register',
     [
         check('regName', 'A full name is required.').not().isEmpty(),
         check(
@@ -56,7 +57,7 @@ router.post(
 );
 
 router.post(
-    '/',
+    '/login',
     [
         check('logEmail', 'An email is required.').not().isEmpty(),
         check('logEmail', 'The email has an invalid format.').isEmail(),
@@ -74,6 +75,12 @@ router.post(
     ],
     loginUser
 );
+
+router.post('/google', [
+    check('tokenId', 'An tokenId is required.').not().isEmpty(),
+    validateFields,
+    googleSignIn,
+]);
 
 router.put('/forgotPassword', [
     check('fgpEmail', 'An email is required.').not().isEmpty(),
