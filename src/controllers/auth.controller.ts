@@ -154,6 +154,7 @@ export const loginUser = async (
             id,
             nombre,
             foto,
+            modo,
             email,
             token,
         });
@@ -204,6 +205,7 @@ export const googleSignIn = async (
                 id: insertId,
                 nombre: name,
                 foto: picture,
+                modo: 'google',
                 email,
                 token,
             });
@@ -229,6 +231,7 @@ export const googleSignIn = async (
             id,
             nombre: name,
             foto: picture,
+            modo: 'google',
             email,
             token,
         });
@@ -259,7 +262,7 @@ export const renewToken = async (
             });
         }
 
-        const { id, nombre, email, foto } = (user as any)[0];
+        const { id, nombre, email, foto, modo } = (user as any)[0];
 
         // generate JSON Web Token
         const token = await generateJWT(uid, name);
@@ -269,6 +272,7 @@ export const renewToken = async (
             id,
             nombre,
             foto,
+            modo,
             email,
             token,
         });
