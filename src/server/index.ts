@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import fileUpload from 'express-fileupload';
 import { Pool } from 'mysql2/promise';
 import colors from 'colors/safe';
 import morgan from 'morgan';
@@ -50,6 +51,14 @@ export class Server {
         this.app.use(express.json());
         // public directory
         this.app.use(express.static('public'));
+        // fileUpload
+        this.app.use(
+            fileUpload({
+                useTempFiles: true,
+                tempFileDir: '/tmp/',
+                createParentPath: true,
+            })
+        );
     }
 
     private routes() {

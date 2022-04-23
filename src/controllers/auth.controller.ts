@@ -6,7 +6,7 @@ import sendEmail from '../services/sendEmail';
 import verifyEmailTemplate from '../services/templates/verifyEmail';
 import forgotPasswordTemplate from '../services/templates/forgotPassword';
 import generateJWT from '../helpers/generateJwt';
-import { IAuthInfoRequest } from '../types/request';
+import { IExtendedRequest } from '../types/request';
 import generateRandomPassword from '../helpers/generateRandomPassword';
 import googleVerify from '../helpers/googleVerify';
 import capitalizeFirstLetter from '../helpers/capitalizeFirstLetter';
@@ -245,7 +245,7 @@ export const googleSignIn = async (
 };
 
 export const renewToken = async (
-    req: IAuthInfoRequest,
+    req: IExtendedRequest,
     res: Response
 ): Promise<Response | void> => {
     const { uid = '', name = '' } = req;

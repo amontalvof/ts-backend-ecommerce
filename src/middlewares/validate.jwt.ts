@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { IAuthInfoRequest } from '../types/request';
+import { IExtendedRequest } from '../types/request';
 
 interface IJwtPayload {
     uid: string;
@@ -8,7 +8,7 @@ interface IJwtPayload {
 }
 
 const validateJwt = (
-    req: IAuthInfoRequest,
+    req: IExtendedRequest,
     res: Response,
     next: NextFunction
 ) => {

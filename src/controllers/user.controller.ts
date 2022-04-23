@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { omit, isEmpty } from 'lodash';
+import { v2 as cloudinary } from 'cloudinary';
 import { Server } from '../server';
+import { IExtendedRequest } from '../types/request';
 
 export const readUser = async (
     req: Request,
@@ -49,6 +51,60 @@ export const updateUser = async (
         res.status(200).json({
             ok: true,
             message: 'User updated successfully.',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Please talk to the administrator.',
+        });
+    }
+};
+
+export const uploadUserImage = async (
+    req: IExtendedRequest,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+            secure: true,
+        });
+        const userFolderPath = 'ecommerce/usuarios';
+        const id = req.params.userId;
+        const conn = Server.connection;
+        const [user] = await conn.query('SELECT * FROM usuarios WHERE id = ?', [
+            id,
+        ]);
+        if (Array.isArray(user) && user.length === 0) {
+            return res.status(400).json({
+                ok: false,
+                message: `There is no user with the id ${id} in the database.`,
+            });
+        }
+        const { foto } = (user as any)[0];
+
+        if (foto) {
+            // delete image from server
+            const nameArr = foto.split('/');
+            const name = nameArr[nameArr.length - 1];
+            const [publicId] = name.split('.');
+            cloudinary.uploader.destroy(`${userFolderPath}/${publicId}`);
+        }
+
+        const { tempFilePath } = req.files.sampleFile;
+        const response = await cloudinary.uploader.upload(tempFilePath, {
+            folder: userFolderPath,
+        });
+        const { secure_url } = response;
+        const userData = { foto: secure_url };
+        await conn.query('UPDATE usuarios set ? WHERE id = ?', [userData, id]);
+
+        res.status(200).json({
+            ok: true,
+            message: 'Image uploaded successfully.',
         });
     } catch (error) {
         console.error(error);

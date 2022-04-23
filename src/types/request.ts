@@ -1,6 +1,7 @@
 import { Request } from 'express';
 
-export interface IAuthInfoRequest extends Request {
+export interface IExtendedRequest extends Request {
     uid?: string;
     name?: string;
+    files?: any;
 }
