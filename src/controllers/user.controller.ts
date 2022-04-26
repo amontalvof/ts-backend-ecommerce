@@ -39,13 +39,13 @@ export const readUser = async (
     }
 };
 
-export const updateUser = async (
+export const verifyUser = async (
     req: Request,
     res: Response
 ): Promise<Response | void> => {
     try {
         const id = req.params.userId;
-        const userData = req.body;
+        const userData = { verificacion: req.body.verificacion };
         const conn = Server.connection;
         await conn.query('UPDATE usuarios set ? WHERE id = ?', [userData, id]);
 
@@ -131,6 +131,7 @@ export const uploadUserImage = async (
 
         res.status(200).json({
             ok: true,
+            secure_url,
             message: 'Image uploaded successfully.',
         });
     } catch (error) {

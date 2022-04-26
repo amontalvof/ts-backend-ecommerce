@@ -5,20 +5,22 @@
 
 import { Router } from 'express';
 import { check } from 'express-validator';
-import {
-    updateUserPassword,
-    uploadUserImage,
-} from '../controllers/user.controller';
 import validateFile from '../middlewares/validate.file';
 import validateJwt from '../middlewares/validate.jwt';
 import verifyPasswordsMatch from '../middlewares/verify.passwords.match';
-const { readUser, updateUser } = require('../controllers/user.controller');
+import {
+    readUser,
+    verifyUser,
+    updateUserPassword,
+    uploadUserImage,
+} from '../controllers/user.controller';
+import validateImg from '../middlewares/validate.img';
 
 const router = Router();
 
 router.post('/', readUser);
 
-router.put('/:userId', updateUser);
+router.put('/verify/:userId', verifyUser);
 
 router.put(
     '/update/pass/:userId',
@@ -43,6 +45,10 @@ router.put(
     updateUserPassword
 );
 
-router.put('/upload/img/:userId', [validateJwt, validateFile], uploadUserImage);
+router.put(
+    '/upload/img/:userId',
+    [validateJwt, validateFile, validateImg],
+    uploadUserImage
+);
 
 export default router;

@@ -11,7 +11,9 @@ const validateFile = (
         Object.keys(req.files).length === 0 ||
         !req.files.sampleFile
     ) {
-        return res.status(400).json({ msg: 'No files were uploaded.' });
+        return res
+            .status(400)
+            .json({ ok: false, message: 'No files were uploaded.' });
     }
     next();
 };
