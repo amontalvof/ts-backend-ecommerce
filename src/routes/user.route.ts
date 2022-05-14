@@ -13,6 +13,7 @@ import {
     verifyUser,
     updateUserPassword,
     uploadUserImage,
+    getUserOrders,
 } from '../controllers/user.controller';
 import validateImg from '../middlewares/validate.img';
 
@@ -50,5 +51,7 @@ router.put(
     [validateJwt, validateFile, validateImg],
     uploadUserImage
 );
+
+router.get('/orders/:userId', [validateJwt], getUserOrders);
 
 export default router;

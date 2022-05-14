@@ -142,3 +142,27 @@ export const uploadUserImage = async (
         });
     }
 };
+
+export const getUserOrders = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const id = req.params.userId;
+        const conn = Server.connection;
+        const [orders] = await conn.query(
+            'SELECT *, compras.id as comprasId, compras.fecha as comprasFecha, productos.id as productosId, productos.fecha as productosFecha FROM compras LEFT JOIN productos ON compras.id_producto = productos.id WHERE id_usuario = ?  ORDER BY compras.fecha DESC',
+            [id]
+        );
+        res.status(200).json({
+            ok: true,
+            orders,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Please talk to the administrator.',
+        });
+    }
+};
