@@ -14,8 +14,11 @@ import {
     updateUserPassword,
     uploadUserImage,
     getUserOrders,
+    updateProductComment,
+    createProductComment,
 } from '../controllers/user.controller';
 import validateImg from '../middlewares/validate.img';
+import validateFields from '../middlewares/validate.fields';
 
 const router = Router();
 
@@ -42,6 +45,7 @@ router.put(
         check('updPassword2').custom((updPassword2, { req }) =>
             verifyPasswordsMatch(updPassword2, req)
         ),
+        validateFields,
     ],
     updateUserPassword
 );
@@ -53,5 +57,40 @@ router.put(
 );
 
 router.get('/orders/:userId', [validateJwt], getUserOrders);
+
+router.put(
+    '/comment/:commentId',
+    [
+        validateJwt,
+        check('calificacion', 'A rate is required.').not().isEmpty(),
+        check(
+            'comentario',
+            'The comment must be less than 300 characters.'
+        ).isLength({ max: 300 }),
+        check(
+            'comentario',
+            'Special characters such as ~!@#$%^&*(){}[]?/ are not allowed.'
+        ).matches(/^[,\\.\\a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ' ]*$/),
+        validateFields,
+    ],
+    updateProductComment
+);
+
+router.post(
+    '/comment/new',
+    [
+        validateJwt,
+        check(
+            'comentario',
+            'The comment must be less than 300 characters.'
+        ).isLength({ max: 300 }),
+        check(
+            'comentario',
+            'Special characters such as ~!@#$%^&*(){}[]?/ are not allowed.'
+        ).matches(/^[,\\.\\a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ' ]*$/),
+        validateFields,
+    ],
+    createProductComment
+);
 
 export default router;

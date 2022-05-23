@@ -151,8 +151,11 @@ export const getUserOrders = async (
         const id = req.params.userId;
         const conn = Server.connection;
         const [orders] = await conn.query(
-            'SELECT *, compras.id as comprasId, compras.fecha as comprasFecha, productos.id as productosId, productos.fecha as productosFecha FROM compras LEFT JOIN productos ON compras.id_producto = productos.id WHERE id_usuario = ?  ORDER BY compras.fecha DESC',
-            [id]
+            `SELECT *, compras.id as comprasId, compras.fecha as comprasFecha, productos.id as productosId, productos.fecha as productosFecha, comments.id as commentsId FROM compras 
+            LEFT JOIN productos ON compras.id_producto = productos.id
+            LEFT JOIN (SELECT id, calificacion, comentario, id_producto FROM comentarios WHERE id_usuario = ?) as comments ON compras.id_producto = comments.id_producto
+            WHERE id_usuario = ?  ORDER BY compras.fecha DESC`,
+            [id, id]
         );
         res.status(200).json({
             ok: true,
@@ -163,6 +166,69 @@ export const getUserOrders = async (
         res.status(500).json({
             ok: false,
             message: 'Please talk to the administrator.',
+        });
+    }
+};
+
+export const createProductComment = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const { calificacion, comentario, productosId, uid } = req.body;
+
+        const newComment = {
+            calificacion,
+            comentario: comentario || '',
+            id_producto: productosId,
+            id_usuario: uid,
+        };
+
+        const conn = Server.connection;
+
+        await conn.query('INSERT INTO comentarios SET ?', [newComment]);
+
+        res.status(200).json({
+            ok: true,
+            message: 'Comment created successfully.',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Sorry there was an error creating the comment.',
+        });
+    }
+};
+
+export const updateProductComment = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const id = req.params.commentId;
+        const { calificacion, comentario } = req.body;
+
+        const commentData = comentario
+            ? { calificacion, comentario }
+            : { calificacion };
+
+        const conn = Server.connection;
+
+        await conn.query('UPDATE comentarios SET ? WHERE id = ?', [
+            commentData,
+            id,
+        ]);
+
+        res.status(200).json({
+            ok: true,
+            message: 'Comment updated successfully.',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Sorry there was an error updating the comment.',
         });
     }
 };
