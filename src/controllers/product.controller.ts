@@ -25,6 +25,30 @@ export const readProduct = async (
     }
 };
 
+export const readProductComments = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const productId = req.params.productId;
+        const conn = Server.connection;
+        const comments = await conn.query(
+            `SELECT comentarios.id as id, calificacion, comentario, nombre, foto FROM comentarios LEFT JOIN usuarios on comentarios.id_usuario=usuarios.id WHERE id_producto = '${productId}' ORDER BY calificacion DESC;`
+        );
+
+        return res.json({
+            ok: true,
+            comments: comments[0],
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Please talk to the administrator.',
+        });
+    }
+};
+
 export const updateProduct = async (
     req: Request,
     res: Response
