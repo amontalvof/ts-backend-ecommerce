@@ -16,6 +16,8 @@ import {
     getUserOrders,
     updateProductComment,
     createProductComment,
+    addToWishList,
+    readWishList,
 } from '../controllers/user.controller';
 import validateImg from '../middlewares/validate.img';
 import validateFields from '../middlewares/validate.fields';
@@ -92,5 +94,18 @@ router.post(
     ],
     createProductComment
 );
+
+router.post(
+    '/wish/new',
+    [
+        validateJwt,
+        check('idProducto', 'A product id is required.').not().isEmpty(),
+        check('idUsuario', 'An user id is required.').not().isEmpty(),
+        validateFields,
+    ],
+    addToWishList
+);
+
+router.get('/wish/:userId', readWishList);
 
 export default router;

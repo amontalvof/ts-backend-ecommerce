@@ -232,3 +232,57 @@ export const updateProductComment = async (
         });
     }
 };
+
+export const addToWishList = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const { idProducto, idUsuario } = req.body;
+
+        const newWish = {
+            id_producto: idProducto,
+            id_usuario: idUsuario,
+        };
+
+        const conn = Server.connection;
+
+        await conn.query('INSERT INTO deseos SET ?', [newWish]);
+
+        res.status(200).json({
+            ok: true,
+            message: 'Wish added successfully.',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Sorry there was an error creating the comment.',
+        });
+    }
+};
+
+export const readWishList = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const id = req.params.userId;
+        const conn = Server.connection;
+        const [deseos] = await conn.query(
+            'SELECT *, deseos.id as deseosId, productos.id as productosId, categorias.id as categoriaId, subcategorias.id as subcategoriaId, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM deseos LEFT JOIN productos ON productos.id = deseos.id_producto LEFT JOIN categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id WHERE deseos.id_usuario = ? ORDER BY deseos.id DESC;',
+            [id]
+        );
+
+        res.status(200).json({
+            ok: true,
+            deseos,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Sorry there was an error creating the comment.',
+        });
+    }
+};
