@@ -18,6 +18,7 @@ import {
     createProductComment,
     addToWishList,
     readWishList,
+    deleteWish,
 } from '../controllers/user.controller';
 import validateImg from '../middlewares/validate.img';
 import validateFields from '../middlewares/validate.fields';
@@ -105,6 +106,8 @@ router.post(
     ],
     addToWishList
 );
+
+router.delete('/wish/:wishId', [validateJwt, validateFields], deleteWish);
 
 router.get('/wish/:userId', readWishList);
 

@@ -257,7 +257,7 @@ export const addToWishList = async (
         console.error(error);
         res.status(500).json({
             ok: false,
-            message: 'Sorry there was an error creating the comment.',
+            message: 'Sorry there was an error adding the wish.',
         });
     }
 };
@@ -282,7 +282,32 @@ export const readWishList = async (
         console.error(error);
         res.status(500).json({
             ok: false,
-            message: 'Sorry there was an error creating the comment.',
+            message: 'Sorry there was an error reading the wish list.',
+        });
+    }
+};
+
+export const deleteWish = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const id = req.params.wishId;
+        const conn = Server.connection;
+        const [deseo] = await conn.query('DELETE from deseos WHERE id = ?', [
+            id,
+        ]);
+
+        res.status(200).json({
+            ok: true,
+            deseo,
+            message: 'Wish deleted successfully.',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Sorry there was an error deleting the wish.',
         });
     }
 };
