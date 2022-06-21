@@ -311,3 +311,47 @@ export const deleteWish = async (
         });
     }
 };
+
+export const deleteUser = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const id = req.params.userId;
+        const { modo, foto } = req.body;
+
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+            secure: true,
+        });
+
+        const conn = Server.connection;
+
+        await conn.query('DELETE from usuarios WHERE id = ?', [id]);
+        await conn.query('DELETE from comentarios WHERE id_usuario = ?', [id]);
+        await conn.query('DELETE from compras WHERE id_usuario = ?', [id]);
+        await conn.query('DELETE from deseos WHERE id_usuario = ?', [id]);
+
+        if (modo === 'directo' && foto) {
+            const userFolderPath = 'ecommerce/usuarios';
+            // delete image from server
+            const nameArr = foto.split('/');
+            const name = nameArr[nameArr.length - 1];
+            const [publicId] = name.split('.');
+            cloudinary.uploader.destroy(`${userFolderPath}/${publicId}`);
+        }
+
+        res.status(200).json({
+            ok: true,
+            message: 'Your account has been successfully deleted.',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Sorry there was an error deleting the user.',
+        });
+    }
+};

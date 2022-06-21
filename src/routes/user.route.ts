@@ -19,6 +19,7 @@ import {
     addToWishList,
     readWishList,
     deleteWish,
+    deleteUser,
 } from '../controllers/user.controller';
 import validateImg from '../middlewares/validate.img';
 import validateFields from '../middlewares/validate.fields';
@@ -110,5 +111,15 @@ router.post(
 router.delete('/wish/:wishId', [validateJwt, validateFields], deleteWish);
 
 router.get('/wish/:userId', readWishList);
+
+router.delete(
+    '/:userId',
+    [
+        validateJwt,
+        check('modo', 'An auth modo is required.').not().isEmpty(),
+        validateFields,
+    ],
+    deleteUser
+);
 
 export default router;
