@@ -270,7 +270,7 @@ export const readWishList = async (
         const id = req.params.userId;
         const conn = Server.connection;
         const [deseos] = await conn.query(
-            'SELECT *, deseos.id as deseosId, productos.id as productosId, categorias.id as categoriaId, subcategorias.id as subcategoriaId, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM deseos LEFT JOIN productos ON productos.id = deseos.id_producto LEFT JOIN categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id WHERE deseos.id_usuario = ? ORDER BY deseos.id DESC;',
+            'SELECT *, deseos.id as deseosId,productos.ruta as ruta, productos.id as productosId, categorias.id as categoriaId, subcategorias.id as subcategoriaId, categorias.ruta as categoriaRuta, subcategorias.subcategoria, subcategorias.ruta as subcategoriaRuta FROM deseos LEFT JOIN productos ON productos.id = deseos.id_producto LEFT JOIN categorias on productos.id_categoria=categorias.id LEFT JOIN subcategorias ON productos.id_subcategoria = subcategorias.id WHERE deseos.id_usuario = ? ORDER BY deseos.id DESC;',
             [id]
         );
 

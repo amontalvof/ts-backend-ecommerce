@@ -60,7 +60,7 @@ router.put(
     uploadUserImage
 );
 
-router.get('/orders/:userId', [validateJwt], getUserOrders);
+router.get('/orders/:userId', [validateJwt, validateFields], getUserOrders);
 
 router.put(
     '/comment/:commentId',
@@ -110,7 +110,7 @@ router.post(
 
 router.delete('/wish/:wishId', [validateJwt, validateFields], deleteWish);
 
-router.get('/wish/:userId', readWishList);
+router.get('/wish/:userId', [validateJwt, validateFields], readWishList);
 
 router.delete(
     '/:userId',

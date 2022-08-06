@@ -6,6 +6,7 @@
 -   Node
 -   Express
 -   JWT
+-   Cloudinary
 -   Nodemailer
 -   Handlebars
 -   Sendgrid
