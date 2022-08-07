@@ -1,4 +1,7 @@
-body{
-    background-color: #47bac1;
-    color: #ffffff;
+body {
+    padding: 10px 20px;
+}
+
+h2 {
+    color: #cc0000;
 }

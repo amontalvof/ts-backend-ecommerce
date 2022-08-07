@@ -1,4 +1,4 @@
-# TypeScript Backend E-Commerce
+# TULOGO Backend E-Commerce
 
 ## Technologies
 
