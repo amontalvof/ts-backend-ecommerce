@@ -7,6 +7,7 @@ export async function connect(): Promise<Pool> {
         password: process.env.DB_PASS,
         database: process.env.DB_NAME,
         connectionLimit: 10,
+        port: Number(process.env.DB_PORT),
     });
     return connection;
 }
