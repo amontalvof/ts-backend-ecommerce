@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.deleteWish = exports.readWishList = exports.addToWishList = exports.updateProductComment = exports.createProductComment = exports.getUserOrders = exports.uploadUserImage = exports.updateUserPassword = exports.verifyUser = exports.readUser = void 0;
+exports.deleteUser = exports.deleteWish = exports.readWishList = exports.addToWishList = exports.updateProductComment = exports.createProductComment = exports.insertUserOrders = exports.getUserOrders = exports.uploadUserImage = exports.updateUserPassword = exports.verifyUser = exports.readUser = void 0;
 const lodash_1 = require("lodash");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const cloudinary_1 = require("cloudinary");
@@ -159,6 +159,36 @@ const getUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.getUserOrders = getUserOrders;
+const insertUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { data } = req.body;
+        const conn = server_1.Server.connection;
+        const [orders] = yield conn.query('INSERT INTO compras (id_usuario, id_producto, envio, metodo, email, direccion, pais) VALUES ?', [
+            data.map((item) => [
+                item.id_usuario,
+                item.id_producto,
+                item.envio,
+                item.metodo,
+                item.email,
+                item.direccion,
+                item.pais,
+            ]),
+        ]);
+        res.status(200).json({
+            ok: true,
+            message: 'Orders inserted successfully.',
+            orders,
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Sorry there was an error inserting the orders.',
+        });
+    }
+});
+exports.insertUserOrders = insertUserOrders;
 const createProductComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { calificacion, comentario, productosId, uid } = req.body;

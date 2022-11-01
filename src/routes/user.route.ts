@@ -20,6 +20,7 @@ import {
     readWishList,
     deleteWish,
     deleteUser,
+    insertUserOrders,
 } from '../controllers/user.controller';
 import validateImg from '../middlewares/validate.img';
 import validateFields from '../middlewares/validate.fields';
@@ -61,6 +62,26 @@ router.put(
 );
 
 router.get('/orders/:userId', [validateJwt, validateFields], getUserOrders);
+
+router.post(
+    '/orders',
+    [
+        validateJwt,
+        check('data.*.id_usuario').not().isEmpty().isNumeric(),
+        check('data.*.id_producto').not().isEmpty().isNumeric(),
+        check('data.*.envio').not().isEmpty().isNumeric(),
+        check('data.*.metodo').not().isEmpty().isString(),
+        check('data.*.email').not().isEmpty().isString().isEmail(),
+        check('data.*.pais').not().isEmpty().isString(),
+        check('data.*.direccion')
+            .not()
+            .isEmpty()
+            .isString()
+            .isLength({ max: 200 }),
+        validateFields,
+    ],
+    insertUserOrders
+);
 
 router.put(
     '/comment/:commentId',

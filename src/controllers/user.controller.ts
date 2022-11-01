@@ -5,6 +5,16 @@ import { v2 as cloudinary } from 'cloudinary';
 import { Server } from '../server';
 import { IExtendedRequest } from '../types/request';
 
+interface IOrdersData {
+    id_usuario: number;
+    id_producto: number;
+    direccion: string;
+    envio: number;
+    metodo: string;
+    email: string;
+    pais: string;
+}
+
 export const readUser = async (
     req: Request,
     res: Response
@@ -166,6 +176,42 @@ export const getUserOrders = async (
         res.status(500).json({
             ok: false,
             message: 'Please talk to the administrator.',
+        });
+    }
+};
+
+export const insertUserOrders = async (
+    req: Request,
+    res: Response
+): Promise<Response | void> => {
+    try {
+        const { data } = req.body;
+        const conn = Server.connection;
+        const [orders] = await conn.query(
+            'INSERT INTO compras (id_usuario, id_producto, envio, metodo, email, direccion, pais) VALUES ?',
+            [
+                data.map((item: IOrdersData) => [
+                    item.id_usuario,
+                    item.id_producto,
+                    item.envio,
+                    item.metodo,
+                    item.email,
+                    item.direccion,
+                    item.pais,
+                ]),
+            ]
+        );
+
+        res.status(200).json({
+            ok: true,
+            message: 'Orders inserted successfully.',
+            orders,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Sorry there was an error inserting the orders.',
         });
     }
 };

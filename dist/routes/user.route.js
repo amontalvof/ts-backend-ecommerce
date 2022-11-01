@@ -29,6 +29,21 @@ router.put('/update/pass/:userId', [
 ], user_controller_1.updateUserPassword);
 router.put('/upload/img/:userId', [validate_jwt_1.default, validate_file_1.default, validate_img_1.default], user_controller_1.uploadUserImage);
 router.get('/orders/:userId', [validate_jwt_1.default, validate_fields_1.default], user_controller_1.getUserOrders);
+router.post('/orders', [
+    validate_jwt_1.default,
+    (0, express_validator_1.check)('data.*.id_usuario').not().isEmpty().isNumeric(),
+    (0, express_validator_1.check)('data.*.id_producto').not().isEmpty().isNumeric(),
+    (0, express_validator_1.check)('data.*.envio').not().isEmpty().isNumeric(),
+    (0, express_validator_1.check)('data.*.metodo').not().isEmpty().isString(),
+    (0, express_validator_1.check)('data.*.email').not().isEmpty().isString().isEmail(),
+    (0, express_validator_1.check)('data.*.pais').not().isEmpty().isString(),
+    (0, express_validator_1.check)('data.*.direccion')
+        .not()
+        .isEmpty()
+        .isString()
+        .isLength({ max: 200 }),
+    validate_fields_1.default,
+], user_controller_1.insertUserOrders);
 router.put('/comment/:commentId', [
     validate_jwt_1.default,
     (0, express_validator_1.check)('calificacion', 'A rate is required.').not().isEmpty(),
